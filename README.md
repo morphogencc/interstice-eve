@@ -1,6 +1,6 @@
 # midnight-eve
 
-midnight-eve (short for 'eavesdropper') is the cpp implementation of the Midnight Commercial Eavesdropper.
+midnight-eve (short for 'eavesdropper') is the cpp half of an activity logging system.
 
 ## Requirements
 * requires midnight-http
