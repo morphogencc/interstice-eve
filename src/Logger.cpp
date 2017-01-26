@@ -18,8 +18,10 @@ void Logger::setClientName(std::string client) {
 	mClientName = client;
 }
 
-void Logger::sendHeartbeat() {
-	sendEvent(EventType::HEARTBEAT, "");
+void Logger::setHeartbeat(int delayInMilliseconds) {
+	mHeartbeatDelay = delayInMilliseconds;
+	mRunHeartbeat = false;
+	mHeartbeatThread = std::thread(&Logger::updateHeartbeat, this);
 }
 
 void Logger::sendInformational(std::string msg) {
@@ -31,7 +33,9 @@ void Logger::sendInteraction(std::string msg) {
 }
 
 Logger::~Logger() {
-
+	if (mHeartbeatThread.joinable()) {
+		mHeartbeatThread.join();
+	}
 }
 
 Logger::Logger() {
@@ -55,4 +59,18 @@ void Logger::sendEvent(EventType event, std::string msg) {
 	Post.mRequestBody = mHttpClient->jsonToString(logMessage);
 
 	mHttpClient->addRequest(Post);
+}
+
+void Logger::sendHeartbeat() {
+	sendEvent(EventType::HEARTBEAT, "");
+}
+
+void Logger::updateHeartbeat() {
+	mRunHeartbeat = true;
+	while (mRunHeartbeat) {
+		mHttpMutex.lock();
+		sendHeartbeat();
+		mHttpMutex.unlock();
+		std::this_thread::sleep_for(std::chrono::milliseconds(mHeartbeatDelay));
+	}
 }
