@@ -8,8 +8,9 @@ namespace midnight {
 	namespace eve {
 		enum EventType {
 			HEARTBEAT,
+			APP_ERROR,
 			INFORMATIONAL,
-			EVENT
+			EVENT,
 		};
 
 		class Logger {
